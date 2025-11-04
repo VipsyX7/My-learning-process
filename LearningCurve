@@ -1,0 +1,77 @@
+using UnityEngine;
+
+
+public class LearningCurve : MonoBehaviour
+{
+    public Transform CamTransform;
+    public int Dog = 3;
+    public GameObject DirectionLight;
+    public Transform LightTransform;
+    void Start()
+    {
+        Character hero = new Character();
+        Character villian = hero;
+        villian.name = "sir kane the Bold";
+        hero.PrintStatsInfo();
+        villian.PrintStatsInfo();
+        Character heroine = new Character("Agatha");
+        heroine.PrintStatsInfo();
+        Character hhhhh = new Character();
+        hhhhh.PrintStatsInfo();
+        Weapon huntingBow = new Weapon("Hunting Bow", 105);
+        huntingBow.PrintWeaponStats();
+        Paladin knight = new Paladin("sir arthur",huntingBow);
+        knight.PrintStatsInfo();
+        CamTransform = this.GetComponent<Transform>();
+        Debug.Log(CamTransform.localPosition);
+        DirectionLight = GameObject.Find("Directional Light");
+        LightTransform = DirectionLight.GetComponent<Transform>();
+        Debug.Log(LightTransform.localPosition);
+    }
+    
+    void Update()
+    {
+        
+    }
+    
+}
+
+
+
+public class Character
+{
+    public string name;
+    public int exp = 0;
+    public Character()
+    {
+        name = "Not assigned";
+        Reset();
+    }
+    public Character(string name)
+    {
+        this.name = name;
+    }
+    public virtual void PrintStatsInfo()
+    {
+        Debug.LogFormat("Hero: {0} - {1} EXP", this.name, this.exp);
+    }
+    private void Reset()
+    {
+        this.name = "Not assinged";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+        this.exp = 0;
+    }
+    
+}
+public class Paladin: Character
+{
+    public Paladin(string name, Weapon weapon): base(name)
+    {
+        this.weapon = weapon;
+    }
+    public Weapon weapon;
+    public override void PrintStatsInfo()
+    {
+        Debug.LogFormat("Hail {0} - take up your {1}!", this.name, this.weapon.name);
+    }
+    
+}
