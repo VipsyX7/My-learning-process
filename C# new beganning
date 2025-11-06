@@ -1,0 +1,14 @@
+using System;
+using System.Diagnostics;
+System.Console.WriteLine("This line has a typo in the namespace declaration.");
+namespace Simple
+{
+    class Program
+    {
+        int var1 = 5;
+        static void Main()
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}
