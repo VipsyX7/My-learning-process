@@ -17,11 +17,21 @@ namespace Simple
 
             return hour;
         }
+        public void MethodWithLocalFunction()
+        {
+            int MyLocalFunction(int z1)
+            {
+                return z1 * 5;
+            }
+        int results = MyLocalFunction(5);
+        Console.WriteLine($"Results of local function call:{results}");
+        }
         static void Main()
         {
             MyClass mc = new MyClass();
             mc.PrintDateAndTime();
             Program.bess();
+            mc.MethodWithLocalFunction();
         }
     }
      class Program
