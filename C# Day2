@@ -10,12 +10,26 @@ namespace Simple
             DateTime dt = DateTime.Now;
             Console.WriteLine($"{dt}");
         }
+        public int GetHour()
+        {
+            DateTime dt = DateTime.Now;
+            int hour = dt.Hour;
 
+            return hour;
+        }
         static void Main()
         {
             MyClass mc = new MyClass();
             mc.PrintDateAndTime();
+            Program.bess();
         }
     }
-
+     class Program
+    {
+        public static void bess()
+        {
+            MyClass mc = new MyClass();
+            Console.WriteLine("Hour: {0}", mc.GetHour());
+        }
+    }
 }
