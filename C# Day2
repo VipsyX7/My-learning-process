@@ -1,0 +1,21 @@
+using System;
+using System.Diagnostics;
+
+namespace Simple
+{
+    class MyClass
+    {
+        void PrintDateAndTime()
+        {
+            DateTime dt = DateTime.Now;
+            Console.WriteLine($"{dt}");
+        }
+
+        static void Main()
+        {
+            MyClass mc = new MyClass();
+            mc.PrintDateAndTime();
+        }
+    }
+
+}
