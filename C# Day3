@@ -26,6 +26,13 @@ namespace Simple
             f2 = f2 + 5;
             Console.WriteLine($"f1.Val:{f1.Val},f2:{f2}");
         }
+        static void RefAsParameter(MyClass f1)
+        {
+            f1.Val = 50;
+            Console.WriteLine($"After memeber assignment:{f1.Val}");
+            f1 = new MyClass();
+            Console.WriteLine($"After new object creation:{f1.Val}");
+        }
         static void Main()
         {
             MyClass myT = new MyClass();
@@ -40,6 +47,13 @@ namespace Simple
                 ("Newsflash: Sum:{0} and {1} is {2}", 5, someint, myT.Sum(5,someint));
             Console.WriteLine
                 ("Newsflash: Avg: {0} and{1} is {2}", 5, someint, myT.Avg(5, someint));
+            MyClass a3 = new MyClass();
+
+            Console.WriteLine($"Before method call:{a3.Val}");
+            RefAsParameter(a3);
+            Console.WriteLine($"After method call:{a3.Val}");
         }
+
+       
     }
 }
