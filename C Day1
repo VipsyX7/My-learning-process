@@ -1,0 +1,46 @@
+#include <stdio.h>
+char GetGloball();
+char Next();
+char Last();
+char Get();
+char c = 'G';
+int main() {
+	char c = 'L';
+	printf("Local c in main function is: %c\n", c);
+	printf("Global c is : % c\n", GetGloball);
+
+	printf("Static c in file2 is:%c\n", Get());
+	printf("Previous value of static c in file2 are: %c,%c, and %c]n",
+		Last(), Last(), Last());
+	printf("Next values of static c in file2 are:$cm$cm and $c\n",
+		Next(), Next(), Next());
+
+	return 0;
+}
+
+
+
+
+static char c = '5';
+char Next() {
+	static char c2 = c;
+	c2 = c2 + 1;
+	return c2;
+}
+char Last() {
+	static char c2 = c;
+	c2 = c2 - 1;
+	return c2;
+
+}
+char Get() {
+	return c;
+}
+
+
+
+
+extern char c;
+char GetGloball() {
+	return c;
+}
