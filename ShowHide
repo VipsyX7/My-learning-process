@@ -1,0 +1,44 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ObjectDetector : MonoBehaviour
+{
+    [SerializeField] private GameObject targetObject; 
+
+    private Renderer objectRenderer;
+
+    void Start()
+    {
+        // 获取Renderer组件
+        objectRenderer = GetComponent<Renderer>();
+        if (objectRenderer == null)
+        {
+            Debug.LogError("本物体需要Renderer组件！");
+        }
+
+        // 初始检测
+        CheckTargetAndUpdateVisibility();
+    }
+
+    void Update()
+    {
+        CheckTargetAndUpdateVisibility();
+    }
+
+    void CheckTargetAndUpdateVisibility()
+    {
+        if (objectRenderer == null) return;
+
+        if (targetObject != null)
+        {
+           
+            objectRenderer.enabled = false;
+        }
+        else
+        {
+            
+            objectRenderer.enabled = true;
+        }
+    }
+}
