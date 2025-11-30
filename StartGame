@@ -1,0 +1,22 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class SimpleSceneLoader : MonoBehaviour
+{
+    void Start()
+    {
+        // 直接获取Button组件并添加监听
+        Button button = GetComponent<Button>();
+        button.onClick.AddListener(LoadNextScene);
+    }
+
+    void LoadNextScene()
+    {
+        // 计算下一个场景的索引
+        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        // 加载场景
+        SceneManager.LoadScene(nextSceneIndex);
+    }
+}
