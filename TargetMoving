@@ -1,0 +1,100 @@
+public class TargetDestroyer : MonoBehaviour
+{
+    [Header("目标物体")]
+    public GameObject targetObject; // 要被破坏的物体
+
+    [Header("移动参数")]
+    public GameObject objectToMove; // 需要移动的物体
+    public Transform destination;   // 目标位置
+    public float moveDuration = 2f; // 移动时间
+    public bool destroyOnReach = false; // 到达后是否销毁目标物体
+
+    private bool hasBeenDestroyed = false;
+    private bool isMoving = false;
+    private Vector3 startPosition;
+    private float moveTimer = 0f;
+
+    void Update()
+    {
+        // 检查目标物体是否被销毁或不存在
+        if (targetObject == null && !hasBeenDestroyed)
+        {
+            OnTargetDestroyed();
+        }
+
+        // 执行移动
+        if (isMoving)
+        {
+            MoveObject();
+        }
+    }
+
+    void OnTargetDestroyed()
+    {
+        hasBeenDestroyed = true;
+
+        if (objectToMove != null && destination != null)
+        {
+            StartMoving();
+        }
+        else
+        {
+            Debug.LogError("未设置要移动的物体或目标位置！");
+        }
+    }
+
+    void StartMoving()
+    {
+        isMoving = true;
+        startPosition = objectToMove.transform.position;
+        moveTimer = 0f;
+
+        Debug.Log($"{objectToMove.name} 开始移动到 {destination.position}");
+    }
+
+    void MoveObject()
+    {
+        moveTimer += Time.deltaTime;
+        float progress = Mathf.Clamp01(moveTimer / moveDuration);
+
+        // 使用插值平滑移动
+        objectToMove.transform.position = Vector3.Lerp(
+            startPosition,
+            destination.position,
+            progress
+        );
+
+        // 可选：添加缓动效果
+        // progress = Mathf.SmoothStep(0f, 1f, progress);
+
+        if (progress >= 1f)
+        {
+            OnMoveComplete();
+        }
+    }
+
+    void OnMoveComplete()
+    {
+        isMoving = false;
+        Debug.Log($"{objectToMove.name} 已到达目的地");
+
+        if (destroyOnReach && objectToMove != null)
+        {
+            Destroy(objectToMove);
+        }
+    }
+
+    // 手动触发（用于测试）
+    [ContextMenu("测试触发移动")]
+    public void TestTrigger()
+    {
+        if (targetObject != null)
+        {
+            Destroy(targetObject);
+        }
+        else
+        {
+            OnTargetDestroyed();
+        }
+    }
+}
