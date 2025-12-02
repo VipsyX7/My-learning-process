@@ -1,0 +1,146 @@
+using UnityEngine;
+
+public class SimpleWorkingTrail : MonoBehaviour
+{
+    [Header("必填设置")]
+    public bool enableTrail = true;
+    public Color trailColor = Color.cyan;
+    public float trailTime = 0.5f;
+    public float trailWidth = 0.3f;
+
+    private TrailRenderer trail;
+    private ParticleSystem particleTrail;
+
+    void Start()
+    {
+        if (!enableTrail) return;
+
+        // 方法1：使用TrailRenderer（最稳定）
+        AddTrailRenderer();
+
+        // 方法2：使用Particle System（可选）
+        // AddParticleTrail();
+    }
+
+    void AddTrailRenderer()
+    {
+        // 1. 添加TrailRenderer组件
+        trail = gameObject.AddComponent<TrailRenderer>();
+
+        // 2. 基本设置（必须）
+        trail.time = trailTime;              // 拖尾持续时间
+        trail.startWidth = trailWidth;       // 起始宽度
+        trail.endWidth = 0f;                 // 结束宽度（必须>0）
+        trail.minVertexDistance = 0.1f;      // 顶点最小距离
+        trail.autodestruct = false;          // 不自动销毁
+
+        // 3. 材质设置（关键！没有材质不会显示）
+        // 方法A：使用内置材质
+        trail.material = new Material(Shader.Find("Sprites/Default"));
+        // 或方法B：使用粒子材质
+        // trail.material = new Material(Shader.Find("Particles/Standard Unlit"));
+
+        // 4. 颜色设置
+        trail.startColor = trailColor;
+        trail.endColor = new Color(trailColor.r, trailColor.g, trailColor.b, 0f);
+
+        // 5. 可选：使用渐变
+        /*
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { 
+                new GradientColorKey(trailColor, 0f), 
+                new GradientColorKey(Color.blue, 1f) 
+            },
+            new GradientAlphaKey[] { 
+                new GradientAlphaKey(1f, 0f), 
+                new GradientAlphaKey(0f, 1f) 
+            }
+        );
+        trail.colorGradient = gradient;
+        */
+
+        Debug.Log("TrailRenderer添加成功！");
+    }
+
+    void AddParticleTrail()
+    {
+        // 创建子物体存放粒子
+        GameObject trailObj = new GameObject("ParticleTrail");
+        trailObj.transform.parent = transform;
+        trailObj.transform.localPosition = Vector3.zero;
+        trailObj.transform.localRotation = Quaternion.Euler(-90, 0, 0); // 重要！
+
+        // 添加粒子系统
+        particleTrail = trailObj.AddComponent<ParticleSystem>();
+
+        // 必须的模块设置
+        var main = particleTrail.main;
+        main.startSpeed = 0f;                // 速度为0，跟随父物体
+        main.startLifetime = 1f;
+        main.startSize = 0.1f;
+        main.maxParticles = 1000;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local; // 重要！
+
+        // 发射模块
+        var emission = particleTrail.emission;
+        emission.rateOverTime = 0f;          // 关闭时间发射
+        emission.rateOverDistance = 30f;     // 距离发射
+
+        // 形状模块
+        var shape = particleTrail.shape;
+        shape.shapeType = ParticleSystemShapeType.Cone;
+        shape.angle = 0f;                    // 0度变成点发射
+        shape.radius = 0.01f;
+
+        // 颜色模块
+        var colorModule = particleTrail.colorOverLifetime;
+        colorModule.enabled = true;
+
+        // 创建渐变
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] {
+                new GradientColorKey(Color.white, 0f),
+                new GradientColorKey(trailColor, 0.5f),
+                new GradientColorKey(Color.blue, 1f)
+            },
+            new GradientAlphaKey[] {
+                new GradientAlphaKey(1f, 0f),
+                new GradientAlphaKey(0.5f, 0.5f),
+                new GradientAlphaKey(0f, 1f)
+            }
+        );
+
+        colorModule.color = gradient;
+
+        // 渲染器设置
+        var renderer = particleTrail.GetComponent<ParticleSystemRenderer>();
+        renderer.material = new Material(Shader.Find("Particles/Standard Unlit"));
+
+        Debug.Log("粒子拖尾添加成功！");
+    }
+
+    void Update()
+    {
+        // 调试信息
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            CheckTrailStatus();
+        }
+    }
+
+    void CheckTrailStatus()
+    {
+        if (trail != null)
+        {
+            Debug.Log($"TrailRenderer: 激活={trail.enabled}, 材质={trail.material}, 时间={trail.time}");
+            Debug.Log($"物体速度: {GetComponent<Rigidbody>()?.velocity.magnitude ?? 0f}");
+        }
+
+        if (particleTrail != null)
+        {
+            Debug.Log($"ParticleSystem: 激活={particleTrail.isPlaying}, 粒子数={particleTrail.particleCount}");
+        }
+    }
+}
