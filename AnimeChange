@@ -1,0 +1,61 @@
+using UnityEngine;
+
+public class MaterialSwitcher : MonoBehaviour
+{
+    [Header("材质设置")]
+    public Material idleMaterial;    // 静止时的材质
+    public Material movingMaterial;  // 移动时的材质
+
+    [Header("移动检测")]
+    public float moveThreshold = 0.01f; // 移动检测阈值
+    public float checkInterval = 0.1f;  // 检测间隔
+
+    private Renderer objectRenderer;
+    private Vector3 lastPosition;
+    private float timer;
+
+    void Start()
+    {
+        objectRenderer = GetComponent<Renderer>();
+        lastPosition = transform.position;
+
+        // 初始化为静止材质
+        objectRenderer.material = idleMaterial;
+    }
+
+    void Update()
+    {
+        timer += Time.deltaTime;
+
+        if (timer >= checkInterval)
+        {
+            CheckMovementAndSwitch();
+            timer = 0;
+        }
+    }
+
+    void CheckMovementAndSwitch()
+    {
+        float distanceMoved = Vector3.Distance(transform.position, lastPosition);
+        lastPosition = transform.position;
+
+        if (distanceMoved > moveThreshold)
+        {
+            // 正在移动
+            if (objectRenderer.sharedMaterial != movingMaterial)
+            {
+                objectRenderer.material = movingMaterial;
+                Debug.Log("切换到移动材质");
+            }
+        }
+        else
+        {
+            // 静止状态
+            if (objectRenderer.sharedMaterial != idleMaterial)
+            {
+                objectRenderer.material = idleMaterial;
+                Debug.Log("切换到静止材质");
+            }
+        }
+    }
+}
