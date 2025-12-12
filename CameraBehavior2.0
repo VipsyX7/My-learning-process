@@ -1,0 +1,125 @@
+using UnityEngine;
+
+public class ThirdPersonBallController : MonoBehaviour
+{
+    [Header("移动设置")]
+    public float moveForce = 15f;
+    public float torqueMultiplier = 8f;
+    public float maxSpeed = 10f;
+
+    [Header("摄像机设置")]
+    public Transform cameraPivot; // 摄像机旋转支点
+    public float cameraDistance = 8f;
+    public float cameraHeight = 4f;
+    public float cameraRotationSpeed = 2f;
+
+    private Rigidbody _rb;
+    private Transform _cameraTransform;
+    private float _cameraRotationY = 0f;
+
+    void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _cameraTransform = Camera.main.transform;
+
+        // 创建摄像机支点
+        if (cameraPivot == null)
+        {
+            GameObject pivot = new GameObject("CameraPivot");
+            cameraPivot = pivot.transform;
+            cameraPivot.position = transform.position;
+        }
+
+        // 设置摄像机初始位置
+        SetupCamera();
+    }
+
+    void SetupCamera()
+    {
+        _cameraRotationY = transform.eulerAngles.y;
+
+        UpdateCameraPosition();
+
+        // 让摄像机看向小球
+        _cameraTransform.LookAt(transform.position);
+    }
+
+    void UpdateCameraPosition()
+    {
+        // 更新摄像机支点位置
+        cameraPivot.position = transform.position;
+
+        // 计算摄像机位置
+        Vector3 cameraOffset = new Vector3(0, cameraHeight, -cameraDistance);
+        Quaternion rotation = Quaternion.Euler(30f, _cameraRotationY, 0f);
+
+        _cameraTransform.position = cameraPivot.position + rotation * cameraOffset;
+    }
+
+    void Update()
+    {
+        // 摄像机旋转控制（鼠标右键拖动）
+        if (Input.GetMouseButton(1))
+        {
+            _cameraRotationY += Input.GetAxis("Mouse X") * cameraRotationSpeed;
+        }
+
+        // 更新摄像机位置
+        UpdateCameraPosition();
+
+        // 让摄像机看向小球
+        _cameraTransform.LookAt(transform.position);
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 input = new Vector2(
+            Input.GetAxis("Horizontal"),
+            Input.GetAxis("Vertical")
+        );
+
+        if (input.magnitude > 0.1f)
+        {
+            // 获取摄像机方向
+            Vector3 cameraForward = _cameraTransform.forward;
+            Vector3 cameraRight = _cameraTransform.right;
+
+            cameraForward.y = 0;
+            cameraRight.y = 0;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+
+            // 计算移动方向（基于摄像机方向）
+            Vector3 moveDirection = cameraForward * input.y + cameraRight * input.x;
+
+            // 施加移动力
+            _rb.AddForce(moveDirection.normalized * moveForce, ForceMode.Force);
+
+            // 限制最大速度
+            Vector3 horizontalVelocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
+            if (horizontalVelocity.magnitude > maxSpeed)
+            {
+                horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+                _rb.velocity = new Vector3(horizontalVelocity.x, _rb.velocity.y, horizontalVelocity.z);
+            }
+
+            // 计算并施加滚动扭矩
+            if (moveDirection.magnitude > 0.1f)
+            {
+                Vector3 torqueDirection = Vector3.Cross(Vector3.up, moveDirection);
+                Vector3 torque = torqueDirection * torqueMultiplier;
+                _rb.AddTorque(torque, ForceMode.Force);
+            }
+        }
+    }
+
+    void OnGUI()
+    {
+        // 显示控制提示
+        GUI.Label(new Rect(10, 10, 300, 100),
+            "控制说明：\n" +
+            "WASD: 移动小球\n" +
+            "鼠标右键拖动: 旋转摄像机\n" +
+            "小球始终在屏幕中心");
+    }
+}
